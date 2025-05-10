@@ -21,7 +21,7 @@ create table if not exists employees
     primary key (name, email)
     );
 
-\copy employees_temp(name, age, email, department, salary) from 'employees.csv' with delimiter ',' csv header;
+\copy employees_temp(name, age, email, department, salary) from '/docker-entrypoint-initdb.d/employees.csv' with delimiter ',' csv header;
 
 insert into employees (name, age, email, department, salary)
 select name, age, email, department, salary from employees_temp

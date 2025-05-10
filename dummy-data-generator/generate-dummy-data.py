@@ -1,7 +1,7 @@
 from faker import Faker
 import csv, random
 
-CSV_FILE_NAME = 'data/employees.csv'
+CSV_FILE_NAME = '../data/employees.csv'
 COLUMNS = ['name', 'age', 'email', 'department', 'salary']
 ROWS = 100
 DEPARTMENTS = ["Human Resources", "Engineering", "IT", "Accounting", "Sales"]
