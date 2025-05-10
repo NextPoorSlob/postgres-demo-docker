@@ -87,3 +87,4 @@ nb-configuration.xml
 ## OS X
 ##############################
 .DS_Store
+/dummy-data-generator/data/
