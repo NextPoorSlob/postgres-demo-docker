@@ -1,16 +1,19 @@
 # This make the database persistent.
-volumes:
-  demo-postgres-data:
-    driver: local
-  demo-pgadmin-data:
-    driver: local
+#volumes:
+#  demo-postgres-data:
+#    driver: local
+#  demo-pgadmin-data:
+#    driver: local
 
 services:
   postgres:
     image: 'postgres:${POSTGRES_VERSION}'
+    env_file:
+      - .env
     container_name: database
     volumes:
-      - "demo-postgres-data:/var/lib/postgresql/data"
+#      - "demo-postgres-data:/var/lib/postgresql/data"
+      - "./initdb.d:/docker-entrypoint-initdb.d"
     restart: 'always'
     ports:
       - "${DB_EXPOSED_PORT}:5432"
@@ -21,6 +24,8 @@ services:
 
   pgadmin:
     image: 'dpage/pgadmin4:${PGADMIN_VERSION}'
+    env_file:
+      - .env
     container_name: pgadmin-tool
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_USERNAME}
@@ -28,7 +33,7 @@ services:
 #      PGADMIN_CONFIG_STORAGE_DIR: "'/home'"
     ports:
       - "${PGADMIN_EXPOSED_PORT}:80"
-    volumes:
-      - "demo-pgadmin-data:/var/lib/pgadmin"
+#    volumes:
+#      - "demo-pgadmin-data:/var/lib/pgadmin"
     depends_on:
       - postgres
