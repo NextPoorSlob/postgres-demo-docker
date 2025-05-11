@@ -5,7 +5,6 @@ import random
 from faker import Faker
 import faker_commerce
 
-
 OUTPUT_DIRECTORY = '../initdb.d/'
 CUSTOMER_COUNT = 200
 PRODUCT_COUNT = 2000
@@ -105,10 +104,32 @@ def create_order_data():
     Combines the customer and product data to form orders in the database.
     :return: void
     """
-    pass
+    output_file_name = OUTPUT_DIRECTORY + "orders.csv"
+    columns = ['customer_id', 'product_id', 'quantity', 'authorization', 'notes']
+
+    with open(output_file_name, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(columns)
+        for index in range(ORDER_COUNT):
+            customer_id = random.randint(1, CUSTOMER_COUNT)
+            product_id = random.randint(1, PRODUCT_COUNT)
+            quantity = random.randint(1, 100)
+            authorization = {'authorized_by': fake.name(), 'authorized_at': fake.date_time()}
+            if is_selected(PROBABILITY_LOW):
+                authorization['reauthorized_by'] = fake.name()
+                authorization['reauthorized_at'] = fake.date_time()
+            notes = {'notes': [fake.text()]}
+            if is_selected(PROBABILITY_LOW):
+                notes['notes'].append(fake.text())
+            if is_selected(PROBABILITY_VERY_LOW):
+                notes['notes'].append(fake.text())
+            writer.writerow([customer_id, product_id, quantity, authorization, notes])
+            if index % 10000 == 0:
+                print(f"Generated {index} orders...")
 
 
 if __name__ == '__main__':
     create_customer_data()
     create_product_data()
     create_order_data()
+    print("Done.")
