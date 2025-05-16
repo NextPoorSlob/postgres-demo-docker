@@ -6,9 +6,9 @@ from faker import Faker
 import faker_commerce
 
 OUTPUT_DIRECTORY = '../initdb.d/'
-CUSTOMER_COUNT = 200
-PRODUCT_COUNT = 2000
-ORDER_COUNT = 2000000
+CUSTOMER_COUNT = 2000
+PRODUCT_COUNT = 10000
+ORDER_COUNT = 20000000
 
 PROBABILITY_HIGH = 1.0 - 0.75
 PROBABILITY_MEDIUM = 1.0 - 0.5
@@ -124,7 +124,7 @@ def create_order_data():
             if is_selected(PROBABILITY_VERY_LOW):
                 notes['notes'].append(fake.text())
             writer.writerow([customer_id, product_id, quantity, authorization, notes])
-            if index % 10000 == 0:
+            if index % 50000 == 0:
                 print(f"Generated {index} orders...")
 
 
