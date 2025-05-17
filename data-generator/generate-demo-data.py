@@ -1,7 +1,9 @@
+import argparse
 import csv
 import json
 import random
 
+import pytz
 from faker import Faker
 import faker_commerce
 
@@ -28,9 +30,10 @@ def is_selected(probability):
     return random.random() > probability
 
 
-def create_customer_data():
+def create_customer_data(customer_count):
     """
     Creates the customer data file used to populate the database.
+    :param customer_count: number of customers to create.
     :return: void
     """
     output_file_name = OUTPUT_DIRECTORY + "customers.csv"
@@ -39,7 +42,7 @@ def create_customer_data():
     with open(output_file_name, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(columns)
-        for _ in range(CUSTOMER_COUNT):
+        for _ in range(customer_count):
             first_name = fake.first_name()
             last_name = fake.last_name()
             organization_name = fake.company()
@@ -79,9 +82,10 @@ def create_additional_information():
     return json.dumps(information)
 
 
-def create_product_data():
+def create_product_data(product_count):
     """
     Creates the product data file used to populate the database.
+    :param product_count: number of products to create.
     :return: void
     """
     output_file_name = OUTPUT_DIRECTORY + "products.csv"
@@ -90,7 +94,7 @@ def create_product_data():
     with open(output_file_name, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(columns)
-        for _ in range(PRODUCT_COUNT):
+        for _ in range(product_count):
             name = fake.ecommerce_name()
             description = fake.sentence()
             cost = fake.ecommerce_price(False)
@@ -99,25 +103,29 @@ def create_product_data():
             writer.writerow([name, description, cost, category, additional_information])
 
 
-def create_order_data():
+def create_order_data(customer_count, product_count, order_count):
     """
     Combines the customer and product data to form orders in the database.
+    :param customer_count: number of customers created.
+    :param product_count: number of products created.
+    :param order_count: number of orders to create.
     :return: void
     """
     output_file_name = OUTPUT_DIRECTORY + "orders.csv"
     columns = ['customer_id', 'product_id', 'quantity', 'authorization', 'notes']
 
+    timezone = pytz.timezone('America/Chicago')
     with open(output_file_name, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(columns)
-        for index in range(ORDER_COUNT):
-            customer_id = random.randint(1, CUSTOMER_COUNT)
-            product_id = random.randint(1, PRODUCT_COUNT)
+        for index in range(order_count):
+            customer_id = random.randint(1, customer_count)
+            product_id = random.randint(1, product_count)
             quantity = random.randint(1, 100)
-            authorization = {'authorized_by': fake.name(), 'authorized_at': fake.date_time()}
+            authorization = {'authorized_by': fake.name(), 'authorized_at': fake.date_time(timezone).strftime('%Y-%m-%dT%H:%M:%S.%f%z')}
             if is_selected(PROBABILITY_LOW):
                 authorization['reauthorized_by'] = fake.name()
-                authorization['reauthorized_at'] = fake.date_time()
+                authorization['reauthorized_at'] = fake.date_time(timezone).strftime('%Y-%m-%dT%H:%M:%S.%f%z')
             notes = {'notes': [fake.text()]}
             if is_selected(PROBABILITY_LOW):
                 notes['notes'].append(fake.text())
@@ -129,7 +137,16 @@ def create_order_data():
 
 
 if __name__ == '__main__':
-    create_customer_data()
-    create_product_data()
-    create_order_data()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--customers", type=int, default=CUSTOMER_COUNT,
+                        help=f"Number of customers to generate. Default is {CUSTOMER_COUNT}")
+    parser.add_argument("-p", "--products", type=int, default=PRODUCT_COUNT,
+                        help=f"Number of products to generate. Default is {PRODUCT_COUNT}")
+    parser.add_argument("-o", "--orders", type=int, default=ORDER_COUNT,
+                        help=f"Number of orders to generate. Default is {ORDER_COUNT}")
+    args = parser.parse_args()
+
+    create_customer_data(args.customers)
+    create_product_data(args.products)
+    create_order_data(args.customers, args.products, args.orders)
     print("Done.")
