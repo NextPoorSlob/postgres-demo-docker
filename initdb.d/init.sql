@@ -20,12 +20,12 @@ CREATE TABLE products (
 );
 
 CREATE TABLE orders (
-    order_id        SERIAL NOT NULL,
-    customer_id     BIGINT NOT NULL,
-    product_id      BIGINT NOT NULL,
-    quantity        INTEGER NOT NULL,
+    order_id          SERIAL NOT NULL,
+    customer_id       INTEGER NOT NULL,
+    product_id        INTEGER NOT NULL,
+    quantity          INTEGER NOT NULL,
     "authorization"   TEXT NOT NULL,
-    notes           TEXT NOT NULL
+    notes             TEXT NOT NULL
 );
 
 \COPY customers(first_name, last_name, organization_name, addresses) FROM '/docker-entrypoint-initdb.d/customers.csv' WITH DELIMITER ',' CSV HEADER;

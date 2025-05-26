@@ -30,9 +30,50 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_USERNAME}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGPASSFILE: "/.pgpass"
     ports:
       - "${PGADMIN_EXPOSED_PORT}:80"
     volumes:
+      - "./storage/pgadmin_pgadmin.com:/var/lib/pgadmin/storage/pgadmin_pgadmin.com"
       - "demo-pgadmin-data:/var/lib/pgadmin"
+    entrypoint: /bin/sh -c "chmod 600 /.pgpass; /entrypoint.sh;"
+    user: root
+    configs:
+      - source: servers.json
+        target: /pgadmin4/servers.json
+      - source: pgpass
+        target: /.pgpass
     depends_on:
       - postgres
+
+configs:
+  pgpass:
+    content: database:5432:postgres:postgres:postgres
+  servers.json:
+    content: |
+      {
+        "Servers": {
+          "1": {
+              "Name": "docker-postgres",
+              "Group": "Servers",
+              "Host": "database",
+              "Port": 5432,
+              "MaintenanceDB": "postgres",
+              "Username": "postgres",
+              "PassFile": "/.pgpass",
+              "UseSSHTunnel": 0,
+              "TunnelPort": "22",
+              "TunnelAuthentication": 0,
+              "TunnelKeepAlive": 0,
+              "KerberosAuthentication": false,
+              "ConnectionParameters": {
+                  "sslmode": "prefer",
+                  "connect_timeout": 10,
+                  "sslcert": "<STORAGE_DIR>/.postgresql/postgresql.crt",
+                  "sslkey": "<STORAGE_DIR>/.postgresql/postgresql.key"
+              },
+              "Tags": []
+          }
+        }
+      }
+
