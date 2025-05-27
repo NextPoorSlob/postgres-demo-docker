@@ -28,12 +28,13 @@ The default sign on credentials are:
 * Password: pgadmin
 
 
-To REGISTER the server, the connection information needed is below. You only have to define this once. 
+The Postgres server is already registered, the the first time you use it, you will need to set the password, which is
+`postgres`.
 If you change port or credentials in the .env file, then use those.
-* Hostname/address: **postgres**
+* Hostname/address: **database** (use **localhost** if connecting with Datagrip or DBeaver)
 * port: **5432**
-* Username: postgres
-* Password: postgres
+* Username: **postgres**
+* Password: **postgres**
 
 To clear the admin data:
 ```text
@@ -45,3 +46,5 @@ The pgadmin-data volume and the pgadmin service can be removed if not needed.
 ## Opening SQL Files In pgAdmin4 A Container
 pgAdmin4 does not have access to your host file system. To run a script in the Query Tool, do not try to open the script.
 Instead, find the script in your file manager and drag the file into the Query Tool.
+
+However, the scripts used in the presentation are preloaded to the pgAdmin4 file system, so they are available to open.
